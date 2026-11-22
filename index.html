@@ -60,11 +60,24 @@ body{max-width:none!important;height:100vh;min-height:0;padding:10px 14px 12px;d
 .foot{display:none}
 @media(max-width:700px){body{padding:7px;gap:5px}.date{font-size:16px}.clock{font-size:26px}.grid>.card:first-child{gap:7px}.grid>.card:first-child #weatherExtra{display:none}.week-grid{gap:2px}.week-event-title{font-size:9px}.week-event-time{font-size:9px}}
 @media(orientation:portrait){.grid>.card:first-child #weatherExtra{display:none}.week-day-header{font-size:9px}.week-day-header strong{font-size:15px}.week-event{padding:3px 2px}.week-event-title{font-size:9px}}
+
+/* Météo et éphéméride côte à côte, calendrier en dessous */
+.grid{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-rows:auto minmax(0,1fr)}
+.grid>.card:first-child{grid-column:1;grid-row:1;min-height:90px;gap:8px 12px;align-content:center}
+.grid>.ephemeris{grid-column:2;grid-row:1;min-height:90px;overflow:hidden;padding:8px 12px}
+.grid>.ephemeris h2{margin:0 0 5px;font-size:13px}
+.ephem-content{display:flex;flex-direction:column;gap:3px}
+.ephem-line{display:flex;align-items:baseline;gap:8px;font-size:11px;line-height:1.2;min-width:0}
+.ephem-label{color:#9fb9d3;min-width:42px;flex:0 0 auto}
+.ephem-line span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ephem-history span:last-child{font-size:10px}
+.grid>.card:nth-child(3){grid-column:1/-1;grid-row:2}
+@media(max-width:700px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}.grid>.card:first-child,.grid>.ephemeris{min-height:80px}.ephem-line{font-size:10px}.ephem-history span:last-child{font-size:9px}}
 </style></head><body>
 <header class="top"><div><div class="eyebrow">IPADDASH · MAISON</div><div class="date" id="today">Chargement…</div><div class="muted">Asnières-sur-Seine · Tableau de bord familial</div></div><div class="clock" id="clock">--:--</div></header>
 <main class="grid">
 <section class="card"><h2>☀️ Météo</h2><div class="big" id="temp">--°</div><div class="muted" id="weatherDescription">Chargement de la météo…</div><div class="muted" id="weatherExtra"></div><div class="status" id="weatherStatus"></div></section>
-<section class="card background-module"><h2>🌅 Éphéméride</h2><div class="item"><div class="muted">Saint du jour</div><div class="item-title" id="saint">Recherche…</div></div><div class="item"><div class="muted">Soleil à Asnières-sur-Seine</div><div class="item-title" id="sun">--:-- / --:--</div></div><div class="item"><div class="muted">Un événement historique du jour</div><div class="item-title" id="history">Recherche…</div></div></section>
+<section class="card ephemeris"><h2>🌅 Éphéméride</h2><div class="ephem-content"><div class="ephem-line"><span class="ephem-label">Saint</span><span id="saint">Recherche…</span></div><div class="ephem-line"><span class="ephem-label">Soleil</span><span id="sun">--:-- / --:--</span></div><div class="ephem-line ephem-history"><span class="ephem-label">Histoire</span><span id="history">Recherche…</span></div></div></section>
 <section class="card wide"><div class="row"><h2>📅 Google Agenda · Vue semaine</h2><span class="pill" id="calendarStatus">Non connecté</span></div><div class="muted" id="calendarEvents">Connecte ton compte Google pour afficher tes rendez-vous privés.</div><div class="actions"><button id="login">Connecter Google Agenda</button><button class="secondary hidden" id="logout">Déconnecter</button></div><details><summary class="small">Configuration Google (à faire une seule fois)</summary><p class="small">Renseigne l'identifiant client OAuth 2.0 de ton application Google Cloud (type « Application Web »). Il n'est pas un mot de passe et peut figurer dans le HTML. N'ajoute jamais de secret client.</p><input autocomplete="off" id="clientId" placeholder="123456789-xxxx.apps.googleusercontent.com" spellcheck="false"/><div class="actions"><button class="secondary" id="saveClient">Enregistrer sur cet iPad</button></div><div class="small" id="oauthMessage"></div></details></section>
 <section class="card wide background-module"><div class="row"><h2>📰 Actualités · France, monde, économie et sport</h2><span class="pill">Flux publics</span></div><div class="muted" id="news">Chargement des titres…</div><div class="actions"><button class="secondary" id="refresh">Actualiser</button><a href="https://news.google.com/home?hl=fr&amp;gl=FR&amp;ceid=FR:fr" rel="noopener" target="_blank">Ouvrir Google Actualités ↗</a></div><p class="small">Les flux publics peuvent être temporairement indisponibles : les liens directs restent accessibles.</p></section>
 </main><footer class="foot">iPadDash · Interface autonome hébergée en HTTPS · Météo Open-Meteo · Agenda Google (lecture seule)</footer>
