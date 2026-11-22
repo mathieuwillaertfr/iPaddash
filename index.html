@@ -73,6 +73,16 @@ body{max-width:none!important;height:100vh;min-height:0;padding:10px 14px 12px;d
 .ephem-history span:last-child{font-size:10px}
 .grid>.card:nth-child(3){grid-column:1/-1;grid-row:2}
 @media(max-width:700px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}.grid>.card:first-child,.grid>.ephemeris{min-height:80px}.ephem-line{font-size:10px}.ephem-history span:last-child{font-size:9px}}
+
+/* Bandeau actualités compact : un titre renouvelé toutes les 30 secondes */
+.grid{flex:1;min-height:0}
+.news-ticker{flex:0 0 45px;min-height:45px;border:1px solid #344861;background:#1c3048;border-radius:12px;padding:6px 12px;display:flex;align-items:center;gap:12px;overflow:hidden}
+.news-ticker-label{font-size:12px;font-weight:700;color:#a8c9e8;white-space:nowrap;flex:0 0 auto}
+.news-ticker-story{min-width:0;flex:1;display:flex;align-items:center;gap:10px}
+.news-ticker-category{font-size:10px;background:#345372;border-radius:9px;padding:3px 7px;white-space:nowrap;color:#e5f0ff}
+.news-ticker-link{font-size:13px;color:#f1f7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;min-width:0;flex:1}
+.news-ticker-count{font-size:10px;color:#93aec8;white-space:nowrap}
+@media(max-width:700px){.news-ticker{padding:5px 8px;gap:6px;flex-basis:39px;min-height:39px}.news-ticker-label{font-size:10px}.news-ticker-link{font-size:11px}.news-ticker-category{display:none}}
 </style></head><body>
 <header class="top"><div><div class="eyebrow">IPADDASH · MAISON</div><div class="date" id="today">Chargement…</div><div class="muted">Asnières-sur-Seine · Tableau de bord familial</div></div><div class="clock" id="clock">--:--</div></header>
 <main class="grid">
@@ -80,7 +90,7 @@ body{max-width:none!important;height:100vh;min-height:0;padding:10px 14px 12px;d
 <section class="card ephemeris"><h2>🌅 Éphéméride</h2><div class="ephem-content"><div class="ephem-line"><span class="ephem-label">Saint</span><span id="saint">Recherche…</span></div><div class="ephem-line"><span class="ephem-label">Soleil</span><span id="sun">--:-- / --:--</span></div><div class="ephem-line ephem-history"><span class="ephem-label">Histoire</span><span id="history">Recherche…</span></div></div></section>
 <section class="card wide"><div class="row"><h2>📅 Google Agenda · Vue semaine</h2><span class="pill" id="calendarStatus">Non connecté</span></div><div class="muted" id="calendarEvents">Connecte ton compte Google pour afficher tes rendez-vous privés.</div><div class="actions"><button id="login">Connecter Google Agenda</button><button class="secondary hidden" id="logout">Déconnecter</button></div><details><summary class="small">Configuration Google (à faire une seule fois)</summary><p class="small">Renseigne l'identifiant client OAuth 2.0 de ton application Google Cloud (type « Application Web »). Il n'est pas un mot de passe et peut figurer dans le HTML. N'ajoute jamais de secret client.</p><input autocomplete="off" id="clientId" placeholder="123456789-xxxx.apps.googleusercontent.com" spellcheck="false"/><div class="actions"><button class="secondary" id="saveClient">Enregistrer sur cet iPad</button></div><div class="small" id="oauthMessage"></div></details></section>
 <section class="card wide background-module"><div class="row"><h2>📰 Actualités · France, monde, économie et sport</h2><span class="pill">Flux publics</span></div><div class="muted" id="news">Chargement des titres…</div><div class="actions"><button class="secondary" id="refresh">Actualiser</button><a href="https://news.google.com/home?hl=fr&amp;gl=FR&amp;ceid=FR:fr" rel="noopener" target="_blank">Ouvrir Google Actualités ↗</a></div><p class="small">Les flux publics peuvent être temporairement indisponibles : les liens directs restent accessibles.</p></section>
-</main><footer class="foot">iPadDash · Interface autonome hébergée en HTTPS · Météo Open-Meteo · Agenda Google (lecture seule)</footer>
+</main><aside aria-label="Fil d’actualités" class="news-ticker"><div class="news-ticker-label">📰 Actualités</div><div class="news-ticker-story"><span class="news-ticker-category" id="tickerCategory">France</span><a class="news-ticker-link" href="https://news.google.com/home?hl=fr&amp;gl=FR&amp;ceid=FR:fr" id="tickerLink" rel="noopener" target="_blank">Chargement des actualités…</a></div><span class="news-ticker-count" id="tickerCount"></span></aside><footer class="foot">iPadDash · Interface autonome hébergée en HTTPS · Météo Open-Meteo · Agenda Google (lecture seule)</footer>
 <script>
 (function(){'use strict';
 var LAT=48.911, LON=2.289;var $=function(id){return document.getElementById(id)};var locale='fr-FR';
@@ -142,8 +152,38 @@ function loadCalendar(){
 }setInterval(function(){if(token)loadCalendar()},5*60*1000);
 // RSS Google News via un service public CORS. Les services tiers peuvent changer ou limiter l'accès.
 var feeds=[{name:'France',q:'France'},{name:'Monde',q:'international'},{name:'Économie',q:'économie'},{name:'Sport',q:'sport'}];
-function loadNews(){var root=$('news');root.innerHTML='';feeds.forEach(function(f){var url='https://news.google.com/rss/search?q='+encodeURIComponent(f.q)+'&hl=fr&gl=FR&ceid=FR:fr';var fallback='https://news.google.com/search?q='+encodeURIComponent(f.q)+'&hl=fr&gl=FR&ceid=FR:fr';var item=document.createElement('div');item.className='item';var tag=document.createElement('div');tag.className='muted';tag.textContent=f.name;item.appendChild(tag);var a=document.createElement('a');a.href=fallback;a.target='_blank';a.rel='noopener';a.textContent='Voir les titres '+f.name+' ↗';item.appendChild(a);root.appendChild(item);
-// rss2json est facultatif, sans clé et non garanti; aucune donnée privée ne lui est transmise.
-getJSON('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),function(err,d){if(err||!d||d.status!=='ok'||!d.items||!d.items.length)return;var article=d.items[0];a.textContent=article.title||a.textContent;if(/^https:\/\//.test(article.link||''))a.href=article.link})})}loadNews();$('refresh').onclick=function(){loadWeather();loadNews();if(token)loadCalendar()};setInterval(loadNews,30*60*1000);
+var tickerStories=[],tickerPosition=0;
+function showTicker(){
+ if(!tickerStories.length)return;
+ var item=tickerStories[tickerPosition%tickerStories.length];
+ $('tickerCategory').textContent=item.category;
+ $('tickerLink').textContent=item.title;
+ $('tickerLink').href=item.url;
+ $('tickerCount').textContent=(tickerPosition%tickerStories.length+1)+' / '+tickerStories.length;
+}
+function nextTicker(){if(!tickerStories.length)return;tickerPosition=(tickerPosition+1)%tickerStories.length;showTicker()}
+setInterval(nextTicker,30000);
+function loadNews(){
+ var root=$('news');root.innerHTML='';
+ tickerStories=[];tickerPosition=0;
+ feeds.forEach(function(f){
+  var url='https://news.google.com/rss/search?q='+encodeURIComponent(f.q)+'&hl=fr&gl=FR&ceid=FR:fr';
+  var fallback='https://news.google.com/search?q='+encodeURIComponent(f.q)+'&hl=fr&gl=FR&ceid=FR:fr';
+  var item=document.createElement('div');item.className='item';
+  var tag=document.createElement('div');tag.className='muted';tag.textContent=f.name;item.appendChild(tag);
+  var a=document.createElement('a');a.href=fallback;a.target='_blank';a.rel='noopener';a.textContent='Voir les titres '+f.name+' ↗';item.appendChild(a);root.appendChild(item);
+  getJSON('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),function(err,d){
+   if(err||!d||d.status!=='ok'||!d.items||!d.items.length)return;
+   var article=d.items[0];a.textContent=article.title||a.textContent;
+   if(/^https:\/\//.test(article.link||''))a.href=article.link;
+   d.items.slice(0,5).forEach(function(n){
+    if(!n.title)return;
+    tickerStories.push({category:f.name,title:n.title,url:/^https:\/\//.test(n.link||'')?n.link:fallback});
+   });
+   if(tickerStories.length===d.items.slice(0,5).filter(function(n){return !!n.title}).length)showTicker();
+  });
+ });
+}
+loadNews();$('refresh').onclick=function(){loadWeather();loadNews();if(token)loadCalendar()};setInterval(loadNews,30*60*1000);
 })();
 </script></body></html>
